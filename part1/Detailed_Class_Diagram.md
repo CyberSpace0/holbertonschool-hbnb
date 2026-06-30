@@ -9,6 +9,8 @@ class User {
     +string email
     +string password
     +bool is_admin
+    +List~Place~ places
+    +List~Review~ reviews
     +datetime created_at
     +datetime updated_at
 
@@ -26,6 +28,9 @@ class Place {
     +float longitude
     +datetime created_at
     +datetime updated_at
+    +User owner
+    +List~Amenity~ amenities
+    +List~Review~ reviews
 
     +create() Place
     +fetch() Place
@@ -37,6 +42,7 @@ class Amenity {
     +UUID id
     +string name
     +string description
+    +List~Place~ places
     +datetime created_at
     +datetime updated_at
 
@@ -48,6 +54,8 @@ class Amenity {
 
 class Review {
     +UUID id
+    +User user
+    +Place place
     +string comment
     +int rating
     +datetime created_at
