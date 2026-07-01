@@ -372,7 +372,7 @@ This document combines the architectural package diagram, business logic class d
 | Diagram | Replace With |
 |----------|--------------|
 | High-Level Package Diagram | `https://github.com/CyberSpace0/holbertonschool-hbnb/blob/main/part1/package-diagram.png` |
-| Business Logic Class Diagram | `https://github.com/CyberSpace0/holbertonschool-hbnb/blob/a2cc68653150e0b562fc0590c0c22c54485a3528/part1/Detaild_Class_Diagaram.png` |
+| Business Logic Class Diagram | `https://github.com/CyberSpace0/holbertonschool-hbnb/blob/a2cc68653150e0b562fc0590c0c22c54485a3528/part1/Detailed_Class_Diagaram.png` |
 | Create User Sequence Diagram | `https://github.com/CyberSpace0/holbertonschool-hbnb/blob/main/part1/sequence-diagrams.md` |
 | Create Place Sequence Diagram | `https://github.com/CyberSpace0/holbertonschool-hbnb/blob/main/part1/sequence-diagrams.md` |
 | Create Review Sequence Diagram | `https://github.com/CyberSpace0/holbertonschool-hbnb/blob/main/part1/sequence-diagrams.md` |
