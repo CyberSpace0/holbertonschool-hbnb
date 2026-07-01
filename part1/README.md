@@ -142,8 +142,6 @@ This section describes the interactions between the client, Presentation layer, 
 
 ## 4.1 Create User
 
-![Create User Sequence Diagram](https://github.com/CyberSpace0/holbertonschool-hbnb/blob/main/part1/sequence-diagrams.md#1-user-registration)
-
 ```mermaid
 sequenceDiagram
     autonumber
@@ -193,8 +191,6 @@ Illustrates how a new user account is created.
 ---
 
 ## 4.2 Create Place
-
-![Create Place Sequence Diagram](https://github.com/CyberSpace0/holbertonschool-hbnb/blob/main/part1/sequence-diagrams.md#2-place-creation)
 
 ```mermaid
 sequenceDiagram
@@ -252,8 +248,6 @@ Illustrates how a new place is created.
 ---
 
 ## 4.3 Create Review
-
-![Create Review Sequence Diagram](https://github.com/CyberSpace0/holbertonschool-hbnb/blob/main/part1/sequence-diagrams.md#3-review-submission)
 
 ```mermaid
 sequenceDiagram
@@ -316,8 +310,6 @@ Illustrates how a user submits a review for a place.
 ---
 
 ## 4.4 Retrieve Places
-
-![Retrieve Places Sequence Diagram](https://github.com/CyberSpace0/holbertonschool-hbnb/blob/main/part1/sequence-diagrams.md#4-fetching-a-list-of-places)
 
 ```mermaid
 sequenceDiagram
