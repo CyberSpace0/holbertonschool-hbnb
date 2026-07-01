@@ -1,6 +1,5 @@
 ## 1. User Registration
 
-![Sequence Diagram - User Registration](<UML_Diagram/Sequence Diagram - User Registration.png>)
 
 ```mermaid
 sequenceDiagram
@@ -37,7 +36,6 @@ sequenceDiagram
 
 ## 2. Place Creation
 
-![Sequence Diagram - Place Creation](<UML_Diagram/Sequence Diagram - Place Creation.png>)
 
 ```mermaid
 sequenceDiagram
@@ -80,7 +78,6 @@ sequenceDiagram
 
 ## 3. Review Submission
 
-![Sequence Diagram - Review Submission](<UML_Diagram/Sequence Diagram - Review Submission.png>)
 
 ```mermaid
 sequenceDiagram
@@ -129,7 +126,6 @@ sequenceDiagram
 
 ## 4. Fetching a List of Places
 
-![Sequence Diagram - Fetching Places](<UML_Diagram/Sequence Diagram - Fetching Places.png>)
 
 ```mermaid
 sequenceDiagram
