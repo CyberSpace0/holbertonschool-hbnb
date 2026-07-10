@@ -27,5 +27,10 @@ class BaseModel:
        return {
            "id": self.id,
            "created_at": self.created_at.isoformat(),
-           "updated_at": self.updated_at.isoformat()
+           "updated_at": self.updated_at.isoformat(),
        }
+
+    def update(self, data):
+        for key, value in data.items():
+            setattr(self, key, value)
+        self.save()

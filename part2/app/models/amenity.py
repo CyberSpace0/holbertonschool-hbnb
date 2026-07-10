@@ -1,7 +1,7 @@
 """Module For review"""
 
 
-from basemodel import BaseModel
+from app.models.basemodel import BaseModel
 
 class Amenity(BaseModel):
     
@@ -12,3 +12,11 @@ class Amenity(BaseModel):
             raise ValueError("name cannot be embty")
         if (len(self.name) > 50):
             raise ValueError("maximum length for name is 50")
+
+    def update(self, data):
+
+        if "name" in data:
+            self.name = data["name"]
+
+        self.validate()
+        self.save()

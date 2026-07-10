@@ -1,6 +1,5 @@
 """Module For Users"""
-from basemodel import BaseModel
-
+from app.models.basemodel import BaseModel
 
 class User(BaseModel):
     """User class"""
@@ -39,3 +38,7 @@ class User(BaseModel):
 
         if not isinstance(self.is_admin, bool):
             raise ValueError("is_admin must be a boolean")
+
+    def updateProfile(self, data):
+        self.update(data)
+        self.validate()

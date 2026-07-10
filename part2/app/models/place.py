@@ -1,8 +1,8 @@
 """Module For place"""
 
 
-from user import User
-from basemodel import BaseModel
+from app.models.user import User
+from app.models.basemodel import BaseModel
 
 
 class Place(BaseModel):
@@ -66,3 +66,7 @@ class Place(BaseModel):
     def remove_amenities(self, amenity):
         if (amenity in self.amenities):
             self.amenities.remove(amenity)
+
+    def updatePlace(self, data):
+        self.update(data)
+        self.validate()

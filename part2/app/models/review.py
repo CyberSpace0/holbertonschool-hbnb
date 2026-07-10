@@ -1,9 +1,9 @@
 """Module For review"""
 
 
-from basemodel import BaseModel
-from user import User
-from place import Place
+from app.models.basemodel import BaseModel
+from app.models.user import User
+from app.models.place import Place
 
 class Review(BaseModel):
     """Review class"""
