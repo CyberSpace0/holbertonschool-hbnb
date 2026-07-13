@@ -69,6 +69,93 @@ place_model = api.model("Place", {
     )
 })
 
+def serialize_place(place):
+    """Convert a Place object into a JSON-compatible dictionary."""
+    return {
+        "id": place.id,
+        "title": place.title,
+        "description": place.description,
+        "price": place.price,
+        "latitude": place.latitude,
+        "longitude": place.longitude,
+        "owner": {
+            "id": place.owner.id,
+            "first_name": place.owner.first_name,
+            "last_name": place.owner.last_name,
+            "email": place.owner.email
+        },
+        "amenities": [
+            {
+                "id": amenity.id,
+                "name": amenity.name
+            }
+            for amenity in place.amenities
+        ],
+        "reviews": [
+            {
+                "id": review.id,
+                "text": review.text,
+                "rating": review.rating,
+                "user_id": review.user.id
+            }
+            for review in place.reviews
+        ]
+    }
+
+
+@api.route("/")
+class PlaceList(Resource):
+
+    @api.expect(place_model, validate=True)
+    @api.response(201, "Place successfully created")
+    @api.response(400, "Invalid input data")
+    def post(self):
+        """Create a new place."""
+        try:
+            place = facade.create_place(api.payload or {})
+            return serialize_place(place), 201
+        except (TypeError, ValueError) as error:
+            return {"error": str(error)}, 400
+
+    @api.response(200, "List of places retrieved successfully")
+    def get(self):
+        """Retrieve a list of all places."""
+        places = facade.get_all_places()
+        return [
+            serialize_place(place)
+            for place in places
+        ], 200
+
+
+@api.route("/<place_id>")
+class PlaceResource(Resource):
+
+    @api.response(200, "Place details retrieved successfully")
+    @api.response(404, "Place not found")
+    def get(self, place_id):
+        """Get place details by ID."""
+        place = facade.get_place(place_id)
+
+        if not place:
+            return {"error": "Place not found"}, 404
+
+        return serialize_place(place), 200
+
+    @api.expect(place_model, validate=True)
+    @api.response(200, "Place updated successfully")
+    @api.response(404, "Place not found")
+    @api.response(400, "Invalid input data")
+    def put(self, place_id):
+        """Update a place."""
+        try:
+            place = facade.update_place(place_id, api.payload or {})
+
+            if not place:
+                return {"error": "Place not found"}, 404
+
+            return serialize_place(place), 200
+        except (TypeError, ValueError) as error:
+            return {"error": str(error)}, 400
 
 @api.route("/<place_id>/reviews")
 class PlaceReviewList(Resource):
