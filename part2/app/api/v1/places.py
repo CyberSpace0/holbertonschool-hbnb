@@ -1,4 +1,4 @@
-"""Place review endpoint and place API models."""
+"""Place API endpoints and models."""
 
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
@@ -24,14 +24,12 @@ amenity_model = api.model("PlaceAmenity", {
 review_model = api.model("PlaceReview", {
     "id": fields.String(description="Review ID"),
     "text": fields.String(description="Text of the review"),
-    "rating": fields.Integer(
-        description="Rating of the place (1-5)"
-    ),
+    "rating": fields.Integer(description="Rating of the place (1-5)"),
     "user_id": fields.String(description="ID of the user")
 })
 
 
-place_model = api.model("Place", {
+place_request_model = api.model("PlaceRequest", {
     "title": fields.String(
         required=True,
         description="Title of the place"
@@ -55,10 +53,21 @@ place_model = api.model("Place", {
         required=True,
         description="ID of the owner"
     ),
-    "owner": fields.Nested(
-        user_model,
-        description="Owner of the place"
-    ),
+    "amenities": fields.List(
+        fields.String,
+        description="List of amenity IDs"
+    )
+})
+
+
+place_response_model = api.model("PlaceResponse", {
+    "id": fields.String(description="Place ID"),
+    "title": fields.String(description="Title of the place"),
+    "description": fields.String(description="Description of the place"),
+    "price": fields.Float(description="Price per night"),
+    "latitude": fields.Float(description="Latitude"),
+    "longitude": fields.Float(description="Longitude"),
+    "owner": fields.Nested(user_model, description="Owner of the place"),
     "amenities": fields.List(
         fields.Nested(amenity_model),
         description="List of amenities"
@@ -68,6 +77,7 @@ place_model = api.model("Place", {
         description="List of reviews"
     )
 })
+
 
 def serialize_place(place):
     """Convert a Place object into a JSON-compatible dictionary."""
@@ -106,8 +116,8 @@ def serialize_place(place):
 @api.route("/")
 class PlaceList(Resource):
 
-    @api.expect(place_model, validate=True)
-    @api.response(201, "Place successfully created")
+    @api.expect(place_request_model, validate=True)
+    @api.response(201, "Place successfully created", place_response_model)
     @api.response(400, "Invalid input data")
     def post(self):
         """Create a new place."""
@@ -130,7 +140,7 @@ class PlaceList(Resource):
 @api.route("/<place_id>")
 class PlaceResource(Resource):
 
-    @api.response(200, "Place details retrieved successfully")
+    @api.response(200, "Place details retrieved successfully", place_response_model)
     @api.response(404, "Place not found")
     def get(self, place_id):
         """Get place details by ID."""
@@ -141,8 +151,8 @@ class PlaceResource(Resource):
 
         return serialize_place(place), 200
 
-    @api.expect(place_model, validate=True)
-    @api.response(200, "Place updated successfully")
+    @api.expect(place_request_model, validate=True)
+    @api.response(200, "Place updated successfully", place_response_model)
     @api.response(404, "Place not found")
     @api.response(400, "Invalid input data")
     def put(self, place_id):
@@ -156,6 +166,7 @@ class PlaceResource(Resource):
             return serialize_place(place), 200
         except (TypeError, ValueError) as error:
             return {"error": str(error)}, 400
+
 
 @api.route("/<place_id>/reviews")
 class PlaceReviewList(Resource):
@@ -176,7 +187,8 @@ class PlaceReviewList(Resource):
             {
                 "id": review.id,
                 "text": review.text,
-                "rating": review.rating
+                "rating": review.rating,
+                "user_id": review.user.id
             }
             for review in reviews
         ], 200
