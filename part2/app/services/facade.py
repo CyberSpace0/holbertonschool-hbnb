@@ -77,6 +77,14 @@ class HBnBFacade:
     def get_all_places(self):
         return self.place_repo.get_all()
 
+    def get_reviews_by_place(self, place_id):
+        place = self.get_place(place_id)
+
+        if not place:
+            return None
+
+        return place.reviews
+
     def update_place(self, place_id, place_data):
         place = self.get_place(place_id)
 
