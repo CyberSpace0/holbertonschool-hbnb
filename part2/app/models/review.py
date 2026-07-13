@@ -23,7 +23,4 @@ class Review(BaseModel):
             raise ValueError("text is required")
         if not isinstance(self.rating, int) or (self.rating < 1 and self.rating > 5):
             raise ValueError("rating rquired between 1 and 5")
-        if not isinstance(self.place, Place):
-            raise ValueError("place must be instance Place")
-        if not isinstance(self.user, User):
-            raise ValueError("User must be instance User")
+
