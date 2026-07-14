@@ -80,7 +80,6 @@ class HBnBFacade:
 
     def get_reviews_by_place(self, place_id):
         place = self.get_place(place_id)
-
         if not place:
             return None
 
@@ -107,6 +106,10 @@ class HBnBFacade:
                 if not amenity:
                     raise ValueError("Amenity not found")
                 place.add_amenities(amenity)
+        if "reviews" in place_data:
+            review = place_data.pop("reviews")
+            place.reviews.append(review)
+            
 
         place.update(place_data)
         place.validate()
@@ -116,6 +119,7 @@ class HBnBFacade:
     # Placeholder for logic to create a review, including validation for user_id, place_id, and rating
         rev = Review(**review_data)
         self.review_repo.add(rev)
+        self.update_place(review_data["place"].id,{"reviews":rev})
         return rev
 
     def get_review(self, review_id):
@@ -123,18 +127,7 @@ class HBnBFacade:
         return self.review_repo.get(review_id)
 
     def get_all_reviews(self):
-        ## Placeholder for logic to retrieve all reviews
-        #x = User("aa","dd","daf@gmail.com","21441Aa32")
-        #print(x.__dict__)
-        #xx = Place("workspace",500,24,11,x,"test only")
-        #print(xx.__dict__)
-        #self.user_repo.add(x)
-        #self.place_repo.add(xx)
         return self.review_repo.get_all()
-
-    def get_reviews_by_place(self, place_id):
-        # Placeholder for logic to retrieve all reviews for a specific place
-        return self.review_repo.get_by_attribute("place",place_id)
 
     def update_review(self, review_id, review_data):
         # Placeholder for logic to update a review
