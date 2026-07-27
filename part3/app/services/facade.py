@@ -1,15 +1,15 @@
 from app.models.place import Place
 from app.models.amenity import Amenity
-from app.persistence.repository import InMemoryRepository
+from app.persistence.repository import SQLAlchemyRepository
 from app.models.user import User
 from app.models.review import Review
 
 class HBnBFacade:
     def __init__(self):
-        self.user_repo = InMemoryRepository()
-        self.place_repo = InMemoryRepository()
-        self.review_repo = InMemoryRepository()
-        self.amenity_repo = InMemoryRepository()
+        self.user_repo = SQLAlchemyRepository(User)
+        self.place_repo = SQLAlchemyRepository(Place)
+        self.review_repo = SQLAlchemyRepository(Review)
+        self.amenity_repo = SQLAlchemyRepository(Amenity)
 
     def create_user(self, user_data):
         user = User(**user_data)
@@ -21,13 +21,12 @@ class HBnBFacade:
 
     def get_user_by_email(self, email):
         return self.user_repo.get_by_attribute('email', email)
-    
+
     def get_alluser(self):
         return self.user_repo.get_all()
-    
+
     def update_user(self, user_id, user_data):
-        """Updates user data. Returns the updated user or None if not found"""
-        return self.user_repo.update(user_id,user_data)
+        return self.user_repo.update(user_id, user_data)
 
     def create_amenity(self, amenity_data):
         amenity = Amenity(**amenity_data)
@@ -41,12 +40,7 @@ class HBnBFacade:
         return self.amenity_repo.get_all()
 
     def update_amenity(self, amenity_id, amenity_data):
-        amenity = self.get_amenity(amenity_id)
-        if not amenity:
-            return None
-
-        amenity.update(amenity_data)
-        return amenity
+        return self.amenity_repo.update(amenity_id, amenity_data)
 
     def create_place(self, place_data):
         owner_id = place_data.pop("owner_id", None)
@@ -106,33 +100,30 @@ class HBnBFacade:
                 if not amenity:
                     raise ValueError("Amenity not found")
                 place.add_amenities(amenity)
+                
         if "reviews" in place_data:
             review = place_data.pop("reviews")
             place.reviews.append(review)
-            
 
-        place.update(place_data)
-        place.validate()
-        return place
+        return self.place_repo.update(place_id, place_data)
 
     def create_review(self, review_data):
-    # Placeholder for logic to create a review, including validation for user_id, place_id, and rating
         rev = Review(**review_data)
         self.review_repo.add(rev)
-        self.update_place(review_data["place"].id,{"reviews":rev})
+        
+        if "place" in review_data:
+            self.update_place(review_data["place"].id, {"reviews": rev})
+            
         return rev
 
     def get_review(self, review_id):
-        # Placeholder for logic to retrieve a review by ID
         return self.review_repo.get(review_id)
 
     def get_all_reviews(self):
         return self.review_repo.get_all()
 
     def update_review(self, review_id, review_data):
-        # Placeholder for logic to update a review
         return self.review_repo.update(review_id, review_data)
 
     def delete_review(self, review_id):
-        # Placeholder for logic to delete a review
         return self.review_repo.delete(review_id)
