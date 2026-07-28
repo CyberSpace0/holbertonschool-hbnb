@@ -1,20 +1,32 @@
 """Module For Users"""
+from app import db
 from app.models.basemodel import BaseModel
 
-class User(BaseModel):
-    """User class"""
-    def __init__(self ,first_name, last_name, email, password=None, is_admin=False):
-        """initailization function"""
-        super().__init__()
+# Inherit from BaseModel and db.Model to map this class to a database table
+class User(BaseModel, db.Model):
+    """User class mapped to the 'users' table"""
+    __tablename__ = 'users'
+
+    # SQLAlchemy Columns
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(128), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+
+    # Added **kwargs to gracefully handle SQLAlchemy background initialization
+    def __init__(self, first_name, last_name, email, password=None, is_admin=False, **kwargs):
+        """Initialization function"""
+        super().__init__(**kwargs)
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
         self.password = password
         self.is_admin = is_admin
         self.validate()
-        
+
     def validate(self):
-        """validate function to ensure all attribaute is correct"""
+        """Validate function to ensure all attributes are correct"""
         if not isinstance(self.first_name, str) or self.first_name.strip() == "":
             raise ValueError("first_name must be a non-empty string")
 
@@ -40,5 +52,6 @@ class User(BaseModel):
             raise ValueError("is_admin must be a boolean")
 
     def updateProfile(self, data):
+        """Update user profile data"""
         self.update(data)
         self.validate()
