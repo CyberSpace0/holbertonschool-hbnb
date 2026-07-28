@@ -1,14 +1,20 @@
 """Amenity model"""
-
+from app import db
 from app.models.basemodel import BaseModel
 
+# Inherit from BaseModel and db.Model to map this class to a database table
+class Amenity(BaseModel, db.Model):
+    """Amenity class mapped to the 'amenities' table"""
+    __tablename__ = 'amenities'
 
-class Amenity(BaseModel):
-    """Amenity class"""
+    # SQLAlchemy Column
+    name = db.Column(db.String(50), nullable=False)
 
-    def __init__(self, name):
-        super().__init__()
-        self.name = name
+    def __init__(self, name=None, **kwargs):
+        """Initialize amenity instance"""
+        super().__init__(**kwargs)
+        if name is not None:
+            self.name = name
         self.validate()
 
     def validate(self):
