@@ -14,6 +14,7 @@ class Review(BaseModel, db.Model):
     # Foreign Keys linking to users and places tables
     user_id = db.Column(db.String(36), db.ForeignKey('users.id'), nullable=False)
     place_id = db.Column(db.String(36), db.ForeignKey('places.id'), nullable=False)
+    user = db.relationship('User', backref='user_reviews')
 
     def __init__(self, text=None, rating=None, place=None, user=None, user_id=None, place_id=None, **kwargs):
         """Initialize function"""
