@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from app import db
+from extention import db
 
 class BaseModel:
     """

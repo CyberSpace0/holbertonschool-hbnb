@@ -1,17 +1,18 @@
-# HBnB Evolution — Part 2
+# HBnB Evolution — Part 3
 
-## Business Logic and RESTful API
+## Authentication, Authorization & Database Persistence
 
-Part 2 of **HBnB Evolution** implements the backend business logic and exposes it through a RESTful API. The application is built with Python, Flask, and Flask-RESTX, and follows a layered architecture that separates the API, business logic, and persistence responsibilities.
+Part 3 of **HBnB Evolution** extends the backend with JWT-based authentication, role-based access control, and persistent database storage using SQLAlchemy. The application is built with Python, Flask, Flask-RESTX, SQLAlchemy, and Flask-JWT-Extended, following the same layered architecture from Part 2.
 
-The API manages four main resources:
+The API manages five main resources:
 
-- Users
+- Users (with admin role support)
 - Amenities
 - Places
 - Reviews
+- Authentication (login/register)
 
-Data is stored in memory through a repository abstraction, so it is reset whenever the application restarts.
+Data is now stored persistently in a SQLite database using SQLAlchemy ORM.
 
 ## Architecture
 
@@ -19,33 +20,37 @@ The application is organized into three layers:
 
 1. **Presentation layer** — Flask-RESTX namespaces and API endpoints.
 2. **Business logic layer** — Domain models and the `HBnBFacade` service.
-3. **Persistence layer** — Repository interface and in-memory implementation.
+3. **Persistence layer** — SQLAlchemy ORM with SQLite database.
 
 The Facade pattern provides a single entry point between the API layer and the application's models and repositories.
 
 ## Features
 
-- Create, retrieve, list, and update users.
-- Create, retrieve, list, and update amenities.
-- Create, retrieve, list, and update places.
-- Create, retrieve, list, update, and delete reviews.
-- Associate places with owners and amenities.
-- Associate reviews with users and places.
-- Validate model attributes and resource relationships.
-- Return appropriate HTTP status codes for invalid or missing resources.
-- Generate interactive Swagger documentation automatically.
-- Run automated unit and endpoint tests.
-- Run manual black-box API tests with `cURL`.
+- User registration and login with hashed passwords
+- JWT token-based authentication
+- Role-based access control (admin and regular users)
+- Create, retrieve, list, and update users (admin-only for listing)
+- Create, retrieve, list, and update amenities
+- Create, retrieve, list, and update places
+- Create, retrieve, list, update, and delete reviews
+- Associate places with owners and amenities
+- Associate reviews with users and places
+- Validate model attributes and resource relationships
+- Persistent storage using SQLite database
+- Return appropriate HTTP status codes for invalid or missing resources
+- Generate interactive Swagger documentation automatically
+- Run automated unit and endpoint tests
 
 ## Project Structure
 
 ```text
-part2/
+part3/
 ├── app/
 │   ├── __init__.py
 │   ├── api/
 │   │   └── v1/
 │   │       ├── amenities.py
+│   │       ├── auth.py
 │   │       ├── places.py
 │   │       ├── reviews.py
 │   │       └── users.py
@@ -59,13 +64,14 @@ part2/
 │   │   └── repository.py
 │   └── services/
 │       └── facade.py
+├── instance/
+│   └── development.db
 ├── test/
 │   ├── __init__.py
 │   ├── test_api.py
 │   └── test_models.py
-├── TESTING_REPORT.md
-├── curl_tests.sh
 ├── config.py
+├── extention.py
 ├── requirements.txt
 ├── run.py
 └── README.md
@@ -76,14 +82,16 @@ part2/
 - Python 3
 - Flask
 - Flask-RESTX
+- Flask-JWT-Extended
+- SQLAlchemy
 
 ## Installation
 
-Clone the repository and move to the Part 2 directory:
+Clone the repository and move to the Part 3 directory:
 
 ```bash
 git clone <repository-url>
-cd holbertonschool-hbnb/part2
+cd holbertonschool-hbnb/part3
 ```
 
 Create and activate a virtual environment:
@@ -107,7 +115,7 @@ pip install -r requirements.txt
 
 ## Running the Application
 
-From the `part2` directory, run:
+From the `part3` directory, run:
 
 ```bash
 python3 run.py
@@ -135,14 +143,20 @@ http://127.0.0.1:5000/swagger.json
 
 The API base path is `/api/v1`.
 
-### Users
+### Authentication
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/users/` | Create a user |
-| `GET` | `/users/` | List all users |
-| `GET` | `/users/<user_id>` | Retrieve a user |
-| `PUT` | `/users/<user_id>` | Update a user |
+| `POST` | `/auth/login` | Login and receive a JWT token |
+| `POST` | `/auth/register` | Register a new user |
+
+### Users
+
+| Method | Endpoint | Description | Auth Required |
+|---|---|---|---|
+| `GET` | `/users/` | List all users (admin only) | Yes (Admin) |
+| `GET` | `/users/<user_id>` | Retrieve a user | No |
+| `PUT` | `/users/<user_id>` | Update a user | Yes (Owner) |
 
 ### Amenities
 
@@ -175,10 +189,10 @@ The API base path is `/api/v1`.
 
 ## Request Examples
 
-### Create a User
+### Register a User
 
 ```bash
-curl -X POST http://127.0.0.1:5000/api/v1/users/ \
+curl -X POST http://127.0.0.1:5000/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "first_name": "Ali",
@@ -188,21 +202,34 @@ curl -X POST http://127.0.0.1:5000/api/v1/users/ \
   }'
 ```
 
-### Create an Amenity
+### Login
+
+```bash
+curl -X POST http://127.0.0.1:5000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "ali@example.com",
+    "password": "secure-password"
+  }'
+```
+
+### Create an Amenity (Authenticated)
 
 ```bash
 curl -X POST http://127.0.0.1:5000/api/v1/amenities/ \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your_jwt_token>" \
   -d '{"name": "Wi-Fi"}'
 ```
 
-### Create a Place
+### Create a Place (Authenticated)
 
 Replace `<user_id>` and `<amenity_id>` with IDs returned by the API.
 
 ```bash
 curl -X POST http://127.0.0.1:5000/api/v1/places/ \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your_jwt_token>" \
   -d '{
     "title": "Seaside Apartment",
     "description": "Apartment close to the beach",
@@ -214,13 +241,14 @@ curl -X POST http://127.0.0.1:5000/api/v1/places/ \
   }'
 ```
 
-### Create a Review
+### Create a Review (Authenticated)
 
 Replace `<user_id>` and `<place_id>` with existing resource IDs.
 
 ```bash
 curl -X POST http://127.0.0.1:5000/api/v1/reviews/ \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <your_jwt_token>" \
   -d '{
     "text": "Excellent stay",
     "rating": 5,
@@ -233,7 +261,7 @@ curl -X POST http://127.0.0.1:5000/api/v1/reviews/ \
 
 | Resource | Main rules |
 |---|---|
-| User | Names are required and limited to 50 characters; email must be valid and unique |
+| User | Names are required and limited to 50 characters; email must be valid and unique; password is hashed |
 | Amenity | Name is required and limited to 50 characters |
 | Place | Title is required; price must be valid; latitude must be from `-90` to `90`; longitude must be from `-180` to `180`; owner and amenities must exist |
 | Review | Text is required; rating must be an integer from `1` to `5`; user and place must exist |
@@ -243,37 +271,23 @@ Common response codes include:
 - `200 OK` — Request completed successfully.
 - `201 Created` — Resource created successfully.
 - `400 Bad Request` — Invalid input or relationship.
+- `401 Unauthorized` — Authentication failed or missing token.
+- `403 Forbidden` — Insufficient permissions (admin required).
 - `404 Not Found` — Requested resource does not exist.
 
 ## Running the Automated Tests
 
-From the `part2` directory, run:
+From the `part3` directory, run:
 
 ```bash
 python3 -m unittest discover -s test -v
 ```
 
-The test suite covers model validation, API operations, boundary values, missing resources, invalid relationships, and Swagger availability.
-
-## Running the cURL Tests
-
-Start the Flask server first:
-
-```bash
-python3 run.py
-```
-
-Then, in another terminal, run:
-
-```bash
-bash curl_tests.sh
-```
-
-A detailed record of the test scope and results is available in [`TESTING_REPORT.md`](TESTING_REPORT.md).
+The test suite covers model validation, API operations, authentication, authorization, boundary values, missing resources, and invalid relationships.
 
 ## Persistence Note
 
-Part 2 uses `InMemoryRepository`. All records exist only while the application process is running. Restarting the server clears the stored users, amenities, places, and reviews.
+Part 3 uses **SQLAlchemy** with a **SQLite** database (`instance/development.db`). All data is persisted on disk and survives application restarts. To reset the database, delete the `instance/development.db` file and restart the server.
 
 ## Authors
 

@@ -1,6 +1,8 @@
 """Module For Users"""
-from app import db
+from extention import db
 from app.models.basemodel import BaseModel
+from extention import bcrypt
+
 
 # Inherit from BaseModel and db.Model to map this class to a database table
 class User(BaseModel, db.Model):
@@ -55,3 +57,9 @@ class User(BaseModel, db.Model):
         """Update user profile data"""
         self.update(data)
         self.validate()
+
+    def verify_password(self, password):
+        """Verify the provided password against the stored hashed password."""
+        return bcrypt.check_password_hash(self.password,password)
+    
+    

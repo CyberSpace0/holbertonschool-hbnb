@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from app import db
+from extention import db
 
 # Abstract base class defining standard repository operations
 class Repository(ABC):

@@ -2,6 +2,8 @@
 
 from flask_restx import Namespace, Resource, fields
 from app.services import facade
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity,get_jwt
+
 
 
 api = Namespace("places", description="Place operations")
@@ -115,13 +117,17 @@ def serialize_place(place):
 
 @api.route("/")
 class PlaceList(Resource):
-
+    @jwt_required()
     @api.expect(place_request_model, validate=True)
     @api.response(201, "Place successfully created", place_response_model)
     @api.response(400, "Invalid input data")
     def post(self):
         """Create a new place."""
         try:
+            current_user_id = get_jwt_identity()
+            if (api.payload.get("owner_id") != current_user_id and not get_jwt()["is_admin"]):
+                return {"error": "Unauthorized action"}, 403
+            api.payload["owner_id"] = current_user_id
             place = facade.create_place(api.payload or {})
             return serialize_place(place), 201
         except (TypeError, ValueError) as error:
@@ -152,17 +158,19 @@ class PlaceResource(Resource):
         return serialize_place(place), 200
 
     @api.expect(place_request_model, validate=True)
+    @jwt_required()
     @api.response(200, "Place updated successfully", place_response_model)
     @api.response(404, "Place not found")
     @api.response(400, "Invalid input data")
     def put(self, place_id):
         """Update a place."""
         try:
-            place = facade.update_place(place_id, api.payload or {})
-
-            if not place:
+            pl = facade.get_place(place_id)
+            if not pl:
                 return {"error": "Place not found"}, 404
-
+            if (pl.owner.id != api.payload.get("owner_id") and not get_jwt()["is_admin"]):
+                return {"error": "Unauthorized action"}, 403
+            place = facade.update_place(place_id, api.payload or {})
             return serialize_place(place), 200
         except (TypeError, ValueError) as error:
             return {"error": str(error)}, 400

@@ -1,5 +1,5 @@
 """Amenity model"""
-from app import db
+from extention import db
 from app.models.basemodel import BaseModel
 
 # Inherit from BaseModel and db.Model to map this class to a database table

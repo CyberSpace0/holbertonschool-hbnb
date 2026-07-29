@@ -3,6 +3,8 @@ from app.models.amenity import Amenity
 from app.persistence.repository import SQLAlchemyRepository
 from app.models.user import User
 from app.models.review import Review
+from extention import bcrypt
+
 
 class HBnBFacade:
     def __init__(self):
@@ -12,10 +14,13 @@ class HBnBFacade:
         self.amenity_repo = SQLAlchemyRepository(Amenity)
 
     def create_user(self, user_data):
+        if (self.get_user_by_email("admin@hbnb.io") is None):
+            admin = User(first_name="Admin", last_name="HBnB", email="admin@hbnb.io", password="$2b$12$QU199VJWbC7K/l85EsEPIuWKB/G2omQnt1B.M27jxWxiWaoJwKgiu", is_admin=True)
+            self.user_repo.add(admin)
         user = User(**user_data)
         self.user_repo.add(user)
         return user
-
+    
     def get_user(self, user_id):
         return self.user_repo.get(user_id)
 
@@ -127,3 +132,6 @@ class HBnBFacade:
 
     def delete_review(self, review_id):
         return self.review_repo.delete(review_id)
+
+    def password_hash(self,password):
+        return bcrypt.generate_password_hash(password).decode('utf-8')

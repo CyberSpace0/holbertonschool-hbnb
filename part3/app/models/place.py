@@ -1,5 +1,5 @@
 """Module For place"""
-from app import db
+from extention import db
 from app.models.basemodel import BaseModel
 from app.models.user import User
 
