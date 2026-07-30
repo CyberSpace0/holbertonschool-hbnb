@@ -57,6 +57,10 @@ class User(BaseModel, db.Model):
         """Update user profile data"""
         self.update(data)
         self.validate()
+        
+    def hash_password(self, password):
+        """Hashes the password before storing it."""
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     def verify_password(self, password):
         """Verify the provided password against the stored hashed password."""
