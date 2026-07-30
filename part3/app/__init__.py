@@ -7,9 +7,7 @@ from app.api.v1.reviews import api as reviews_ns
 from extention import db, bcrypt
 from flask_jwt_extended import JWTManager
 from app.api.v1.auth import api as auth_ns
-from flask_bcrypt import Bcrypt
 
-bcrypt = Bcrypt()
 
 jwt = JWTManager()
 
